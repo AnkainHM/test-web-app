@@ -1,55 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Test Web App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test WebApp</title>
 </head>
-<body style="font-family: sans-serif; padding: 20px; text-align: center;">
-  <h2>Тест отправки данных</h2>
-  <p>Нажмите кнопку ниже, чтобы отправить данные боту.</p>
+<body>
+  <h1>🚀 Test Telegram WebApp</h1>
+  <p>Выбери опцию и нажми кнопку "Отправить"</p>
 
-  <button id="sendBtn" style="padding: 12px 24px; font-size: 18px; margin-top: 20px;">
-    Отправить данные
-  </button>
+  <select id="option">
+    <option value="1">Вариант 1</option>
+    <option value="2">Вариант 2</option>
+    <option value="3">Вариант 3</option>
+  </select>
 
   <script>
-    // Ждём, пока Telegram WebApp SDK загрузится
-    if (window.Telegram?.WebApp) {
-      const webApp = Telegram.WebApp;
-      webApp.ready();
+    const tg = window.Telegram?.WebApp;
 
-      // Настройка кнопки
-      webApp.MainButton.setText('Отправить данные');
-      webApp.MainButton.show();
-      webApp.MainButton.enable();
-
-      // Обработчик нажатия
-      webApp.MainButton.onClick(() => {
-        const testData = {
-          test: true,
-          from: 'minimal-web-app',
-          timestamp: Date.now(),
-        };
-
-        // ⚠️ ВАЖНО: sendData() должен вызываться СРАЗУ, без setTimeout/async!
-        webApp.sendData(JSON.stringify(testData));
-        webApp.close();
-      });
-
-      // Альтернатива: кнопка на странице (на случай, если MainButton не отображается)
-      document.getElementById('sendBtn').addEventListener('click', () => {
-        const testData = {
-          test: true,
-          from: 'page-button',
-          timestamp: Date.now(),
-        };
-        webApp.sendData(JSON.stringify(testData));
-        webApp.close();
-      });
+    if (!tg) {
+      alert("❌ Telegram WebApp API не найден. Открой через Telegram!");
     } else {
-      document.body.innerHTML = '<h2>Эта страница работает только внутри Telegram!</h2>';
+      tg.ready();
+      console.log("✅ WebApp готов");
+      console.log("initDataUnsafe:", tg.initDataUnsafe);
+
+      tg.MainButton.setText("Отправить");
+      tg.MainButton.show();
+
+      tg.MainButton.onClick(() => {
+        const option = document.getElementById("option").value;
+        const payload = { testValue: option, time: new Date().toISOString() };
+
+        console.log("📤 Отправка данных:", payload);
+        tg.sendData(JSON.stringify(payload));
+
+        tg.showAlert("✅ Данные отправлены!");
+        setTimeout(() => tg.close(), 800); // важная задержка!
+      });
     }
   </script>
 </body>
