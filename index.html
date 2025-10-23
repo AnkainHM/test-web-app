@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test Web App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body style="font-family: sans-serif; padding: 20px; text-align: center;">
+  <h2>Тест отправки данных</h2>
+  <p>Нажмите кнопку ниже, чтобы отправить данные боту.</p>
+
+  <button id="sendBtn" style="padding: 12px 24px; font-size: 18px; margin-top: 20px;">
+    Отправить данные
+  </button>
+
+  <script>
+    // Ждём, пока Telegram WebApp SDK загрузится
+    if (window.Telegram?.WebApp) {
+      const webApp = Telegram.WebApp;
+      webApp.ready();
+
+      // Настройка кнопки
+      webApp.MainButton.setText('Отправить данные');
+      webApp.MainButton.show();
+      webApp.MainButton.enable();
+
+      // Обработчик нажатия
+      webApp.MainButton.onClick(() => {
+        const testData = {
+          test: true,
+          from: 'minimal-web-app',
+          timestamp: Date.now(),
+        };
+
+        // ⚠️ ВАЖНО: sendData() должен вызываться СРАЗУ, без setTimeout/async!
+        webApp.sendData(JSON.stringify(testData));
+        webApp.close();
+      });
+
+      // Альтернатива: кнопка на странице (на случай, если MainButton не отображается)
+      document.getElementById('sendBtn').addEventListener('click', () => {
+        const testData = {
+          test: true,
+          from: 'page-button',
+          timestamp: Date.now(),
+        };
+        webApp.sendData(JSON.stringify(testData));
+        webApp.close();
+      });
+    } else {
+      document.body.innerHTML = '<h2>Эта страница работает только внутри Telegram!</h2>';
+    }
+  </script>
+</body>
+</html>
